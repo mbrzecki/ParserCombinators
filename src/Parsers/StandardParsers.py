@@ -9,6 +9,10 @@ def parse_string(txt):
     return cmb.and_then(*[bp.CharParser(char) for char in txt])
 
 
+def parse_character(*chars):
+    return cmb.or_else(*[bp.CharParser(char) for char in chars])
+
+
 def parse_digit():
     return cmb.or_else(*[bp.CharParser(char) for char in string.digits])
 
@@ -33,11 +37,11 @@ def parse_lowercases():
     return cmb.many1(*[bp.CharParser(char) for char in string.ascii_lowercase])
 
 
-def parse_character():
+def parse_letter():
     return cmb.or_else(*[bp.CharParser(char) for char in string.ascii_letters])
 
 
-def parse_characters():
+def parse_letters():
     return cmb.many1(*[bp.CharParser(char) for char in string.ascii_letters])
 
 

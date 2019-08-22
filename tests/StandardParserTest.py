@@ -18,6 +18,24 @@ class TestStandardParsers(unittest.TestCase):
         self.assertEqual(result_succ, expected_succ)
         self.assertEqual(result_fail, expected_fail)
 
+    def test_parse_character(self):
+        # Arrange
+        txt1 = 'aaa'
+        txt2 = 'bbb'
+        txt3 = 'ccc'
+        parser = stp.parse_character('a', 'b')
+        # Act
+        result_succ1 = parser(txt1)
+        result_succ2 = parser(txt2)
+        result_fail = parser(txt3)
+        expected_succ1 = res.Success(('a', 'aa'))
+        expected_succ2 = res.Success(('b', 'bb'))
+        expected_fail = res.Failure('error')
+        # Assert
+        self.assertEqual(result_succ1, expected_succ1)
+        self.assertEqual(result_succ2, expected_succ2)
+        self.assertEqual(result_fail, expected_fail)
+
     def test_parse_digit(self):
         pass
         # Arrange
@@ -103,12 +121,12 @@ class TestStandardParsers(unittest.TestCase):
         self.assertEqual(res_succ, exp_succ)
         self.assertEqual(res_fail, exp_fail)
 
-    def test_parse_character(self):
+    def test_parse_letter(self):
         # Arrange
         txt_succ1 = 'abcd'
         txt_succ2 = 'ABCabc123'
         txt_fail = '123'
-        parser = stp.parse_character()
+        parser = stp.parse_letter()
         # Act
         res_succ1 = parser(txt_succ1)
         res_succ2 = parser(txt_succ2)
@@ -121,12 +139,12 @@ class TestStandardParsers(unittest.TestCase):
         self.assertEqual(res_succ2, exp_succ2)
         self.assertEqual(res_fail, exp_fail)
 
-    def test_parse_characters(self):
+    def test_parse_letters(self):
         # Arrange
         txt_succ1 = 'abcd'
         txt_succ2 = 'ABCabc123'
         txt_fail = '123'
-        parser = stp.parse_characters()
+        parser = stp.parse_letters()
         # Act
         res_succ1 = parser(txt_succ1)
         res_succ2 = parser(txt_succ2)

@@ -1,0 +1,4 @@
+/tests/__pycache__/*.pyc
+/.idea
+/src/Monads/__pycache__/*.pyc
+/src/Parsers/__pycache__/*.pyc
