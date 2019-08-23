@@ -8,7 +8,7 @@ class TestStandardParsers(unittest.TestCase):
         # Arrange
         txt = 'lorem ipsum'
         parser_succ = stp.parse_string('lorem')
-        parser_fail = stp.parse_string('ipsum')
+        parser_fail = stp.parse_string('ipsum', label='FAIL')
         # Act
         result_succ = parser_succ(txt)
         result_fail = parser_fail(txt)
@@ -17,6 +17,8 @@ class TestStandardParsers(unittest.TestCase):
         # Assert
         self.assertEqual(result_succ, expected_succ)
         self.assertEqual(result_fail, expected_fail)
+        self.assertEqual(parser_succ.label, 'lorem')
+        self.assertEqual(parser_fail.label, 'FAIL')
 
     def test_parse_character(self):
         # Arrange

@@ -1,12 +1,13 @@
 import string
 import src.Parsers.BasicParsers as bp
 import src.Parsers.Combinators as cmb
+#TODO: add Labels
 
 
-def parse_string(txt):
+def parse_string(txt, label=None):
     if not isinstance(txt, str):
         raise Exception('Expected string')
-    return cmb.and_then(*[bp.CharParser(char) for char in txt])
+    return cmb.and_then(*[bp.CharParser(char) for char in txt], label=label)
 
 
 def parse_character(*chars):

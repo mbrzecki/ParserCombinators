@@ -2,9 +2,16 @@ import src.Monads.Result as res
 import src.Parsers.BasicParsers as bp
 
 
-def and_then(*parsers):
+def and_then(*parsers, **kwargs):
+    """
+    Applies parsers one by one. All parsers must be successful to return Success
+    """
+    label = kwargs.get('label', None)
+    if label is None:
+        label = ''.join([p.label for p in parsers])
+
     if len(parsers) == 1:
-        return bp.CharParser(parsers[0])
+        return bp.CharParser(parsers[0], label)
 
     if len(parsers) == 2:
         def internal(txt):
@@ -19,16 +26,23 @@ def and_then(*parsers):
             char2, remaining2 = res2.value
 
             return res.Success((char1 + char2, remaining2))
-        return bp.CharParser(internal)
+        return bp.CharParser(internal, label)
 
     parser_new = and_then(parsers[0], parsers[1])
     new_parsers = [parser_new] + list(parsers[2:])
-    return and_then(*new_parsers)
+    return and_then(*new_parsers, label=label)
 
 
-def or_else(*parsers):
+def or_else(*parsers, **kwargs):
+    """
+    Applies parsers one by one. At least one parsers must be successful to return Success
+    """
+    label = kwargs.get('label', None)
+    if label is None:
+        label = '[' + ''.join([p.label for p in parsers]) + ']'
+
     if len(parsers) == 1:
-        return bp.CharParser(parsers[0])
+        return bp.CharParser(parsers[0], label)
 
     if len(parsers) == 2:
         def internal(txt):
@@ -41,17 +55,21 @@ def or_else(*parsers):
                 return res2
 
             return res.Failure('error')
-        return bp.CharParser(internal)
+        return bp.CharParser(internal, label)
 
     parser_new = or_else(parsers[0], parsers[1])
     new_parsers = [parser_new] + list(parsers[2:])
-    return or_else(*new_parsers)
+    return or_else(*new_parsers, label=label)
 
 
-def many(*parsers):
+def many(*parsers, **kwargs):
     """
     matches zero or more occurrences of the specified parsers.
     """
+    label = kwargs.get('label', None)
+    if label is None:
+        label = '(' + ''.join([p.label for p in parsers]) + ')*'
+
     if len(parsers) == 0:
         raise Exception("Expected parser")
     if len(parsers) == 1:
@@ -69,13 +87,16 @@ def many(*parsers):
         ret = (parsed1 + parsed2, remaining2)
         return res.Success.unit(ret)
 
-    return bp.CharParser(internal)
+    return bp.CharParser(internal, label=label)
 
 
-def many1(*parsers):
+def many1(*parsers, **kwargs):
     """
     matches one or more occurrences of the specified parsers.
     """
+    label = kwargs.get('label', None)
+    if label is None:
+        label = '(' + ''.join([p.label for p in parsers]) + ')+'
     parser = many(*parsers)
 
     def internal(txt):
@@ -84,13 +105,17 @@ def many1(*parsers):
             return result
         return res.Failure.unit("error")
 
-    return bp.CharParser(internal)
+    return bp.CharParser(internal, label)
 
 
-def opt(*parsers):
+def opt(*parsers, **kwargs):
     """
     matches zero or one occurrence of the specified parsers.
     """
+    label = kwargs.get('label', None)
+    if label is None:
+        label = '(' + ''.join([p.label for p in parsers]) + ')?'
+
     parser = or_else(*parsers)
 
     def internal(txt):
@@ -103,26 +128,34 @@ def opt(*parsers):
             if snd_result.isFailure:
                 return fst_result
         return res.Failure('error')
-    return bp.CharParser(internal)
+
+    return bp.CharParser(internal, label)
 
 
-def parse_any():
+def parse_any(**kwargs):
     """
     matches any pattern.
     """
+    label = kwargs.get('label', None)
+    if label is None:
+        label = '.?'
+
     def internal(txt):
         if txt == "":
             return res.Failure("No more input")
         return res.Success.unit((txt[0], txt[1:]))
 
-    return bp.CharParser(internal)
+    return bp.CharParser(internal, label)
 
 
-def until(*parsers):
+def until(*parsers, **kwargs):
     """
     matches zero or one occurrence of the specified parsers.
     """
     parser = or_else(*parsers)
+    label = kwargs.get('label', None)
+    if label is None:
+        label = '(.*?)[' + ''.join([p.label for p in parsers]) + ']'
 
     def internal(input_txt):
         ret = ""
@@ -139,13 +172,17 @@ def until(*parsers):
             return res.Success.unit((ret, txt))
         return res.Failure("No more input")
 
-    return bp.CharParser(internal)
+    return bp.CharParser(internal, label)
 
 
-def leftparser(lparser, rparser):
+def leftparser(lparser, rparser, **kwargs):
     """
     Matches left parsers then right one, return result of left parser
     """
+    label = kwargs.get('label', None)
+    if label is None:
+        label = lparser.label + rparser.label
+
     def internal(txt):
         fst_result = lparser(txt)
         if isinstance(fst_result, res.Failure):
@@ -158,13 +195,17 @@ def leftparser(lparser, rparser):
 
         return res.Success.unit((parsed, remaining))
 
-    return bp.CharParser(internal)
+    return bp.CharParser(internal, label)
 
 
-def rightparser(lparser, rparser):
+def rightparser(lparser, rparser, **kwargs):
     """
     Matches left parsers then right one, return result of right parser
     """
+    label = kwargs.get('label', None)
+    if label is None:
+        label = lparser.label + rparser.label
+
     def internal(txt):
         fst_result = lparser(txt)
         if fst_result.isFailure:
@@ -177,13 +218,17 @@ def rightparser(lparser, rparser):
 
         return res.Success.unit((parsed, remaining))
 
-    return bp.CharParser(internal)
+    return bp.CharParser(internal, label)
 
 
-def betweenparsers(lparser, mparser, rparser):
+def betweenparsers(lparser, mparser, rparser, **kwargs):
     """
     Matches left parsers then mid one and finally right one, return result of middle parser
     """
+    label = kwargs.get('label', None)
+    if label is None:
+        label = lparser.label + mparser.label + rparser.label
+
     def internal(txt):
         fst_result = lparser(txt)
         if fst_result.isFailure:
@@ -200,13 +245,17 @@ def betweenparsers(lparser, mparser, rparser):
 
         return res.Success.unit((parsed, remaining))
 
-    return bp.CharParser(internal)
+    return bp.CharParser(internal, label)
 
 
-def sep_by(item, sep):
+def sep_by(item, sep, **kwargs):
     """
     parses zero or more occurrences of a parser with a separator
     """
+    label = kwargs.get('label', None)
+    if label is None:
+        label = item.label + '[' + sep.label + item.label + ']+'
+
     parser = rightparser(sep, item)
 
     def internal(txt):
@@ -226,13 +275,17 @@ def sep_by(item, sep):
             p, remaining = result.value
             ret.append(p)
         return res.Success.unit((ret, remaining))
-    return bp.CharParser(internal)
+
+    return bp.CharParser(internal, label)
 
 
-def sep_by1(item, sep):
+def sep_by1(item, sep, **kwargs):
     """
     parses one or more occurrences of a parser with a separator
     """
+    label = kwargs.get('label', None)
+    if label is None:
+        label = item.label + '[' + sep.label + item.label + ']+'
     parser = rightparser(sep, item)
 
     def internal(txt):
@@ -253,4 +306,4 @@ def sep_by1(item, sep):
             ret.append(p)
         return res.Success.unit((ret, remaining))
 
-    return bp.CharParser(internal)
+    return bp.CharParser(internal, label)

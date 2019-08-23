@@ -62,6 +62,17 @@ class TestAndThen(unittest.TestCase):
         self.assertEqual(result3, expected3)
         self.assertEqual(result4, expected4)
 
+    def test_AddingLabel(self):
+        # Arrange
+        parser1 = bpr.CharParser('l')
+        parser2 = bpr.CharParser('o')
+        parser3 = bpr.CharParser('r')
+        parser = cmb.and_then(parser1, parser2, parser3, label='Parser: lor')
+        parser_default_label = cmb.and_then(parser1, parser2, parser3)
+        # Assert
+        self.assertEqual(parser.label, 'Parser: lor')
+        self.assertEqual(parser_default_label.label, 'lor')
+
 
 class TestOrElse(unittest.TestCase):
     def test_SuccessCase(self):
@@ -104,7 +115,6 @@ class TestOrElse(unittest.TestCase):
         parser_o = bpr.CharParser('i')
         parser_r = bpr.CharParser('d')
         parser_e = bpr.CharParser('s')
-
         parser = cmb.or_else(parser_l, parser_o, parser_r, parser_e)
         # Act
         result1 = parser(txt1)
@@ -120,6 +130,17 @@ class TestOrElse(unittest.TestCase):
         self.assertEqual(result2, expected2)
         self.assertEqual(result3, expected3)
         self.assertEqual(result4, expected4)
+
+    def test_AddingLabel(self):
+        # Arrange
+        parser1 = bpr.CharParser('l')
+        parser2 = bpr.CharParser('o')
+        parser3 = bpr.CharParser('r')
+        parser = cmb.or_else(parser1, parser2, parser3, label='Parser: lor')
+        parser_default_label = cmb.or_else(parser1, parser2, parser3)
+        # Assert
+        self.assertEqual(parser.label, 'Parser: lor')
+        self.assertEqual(parser_default_label.label, '[lor]')
 
 
 class TestMany(unittest.TestCase):
@@ -195,6 +216,17 @@ class TestMany(unittest.TestCase):
         # Assert
         self.assertEqual('Expected parser', str(context.exception))
 
+    def test_AddingLabel(self):
+        # Arrange
+        parser1 = bpr.CharParser('l')
+        parser2 = bpr.CharParser('o')
+        parser3 = bpr.CharParser('r')
+        parser = cmb.many(parser1, parser2, parser3, label='Parser: lor')
+        parser_default_label = cmb.many(parser1, parser2, parser3)
+        # Assert
+        self.assertEqual(parser.label, 'Parser: lor')
+        self.assertEqual(parser_default_label.label, '(lor)*')
+
 
 class TestMany1(unittest.TestCase):
     def test_SuccessCase(self):
@@ -268,6 +300,17 @@ class TestMany1(unittest.TestCase):
         # Assert
         self.assertEqual('Expected parser', str(context.exception))
 
+    def test_AddingLabel(self):
+        # Arrange
+        parser1 = bpr.CharParser('l')
+        parser2 = bpr.CharParser('o')
+        parser3 = bpr.CharParser('r')
+        parser = cmb.many1(parser1, parser2, parser3, label='Parser: lor')
+        parser_default_label = cmb.many1(parser1, parser2, parser3)
+        # Assert
+        self.assertEqual(parser.label, 'Parser: lor')
+        self.assertEqual(parser_default_label.label, '(lor)+')
+
 
 class TestOpt(unittest.TestCase):
     def test_SuccessCase(self):
@@ -332,6 +375,17 @@ class TestOpt(unittest.TestCase):
         self.assertEqual(result1, expected1)
         self.assertEqual(result2, expected2)
 
+    def test_AddingLabel(self):
+        # Arrange
+        parser1 = bpr.CharParser('l')
+        parser2 = bpr.CharParser('o')
+        parser3 = bpr.CharParser('r')
+        parser = cmb.opt(parser1, parser2, parser3, label='Parser: lor')
+        parser_default_label = cmb.opt(parser1, parser2, parser3)
+        # Assert
+        self.assertEqual(parser.label, 'Parser: lor')
+        self.assertEqual(parser_default_label.label, '(lor)?')
+
 
 class TestAny(unittest.TestCase):
     def test_SuccessCase(self):
@@ -361,6 +415,14 @@ class TestAny(unittest.TestCase):
         expected = res.Failure('No more input')
         # Assert
         self.assertEqual(result, expected)
+
+    def test_AddingLabel(self):
+        # Arrange
+        parser = cmb.parse_any(label='Parser: lor')
+        parser_default_label = cmb.parse_any()
+        # Assert
+        self.assertEqual(parser.label, 'Parser: lor')
+        self.assertEqual(parser_default_label.label, '.?')
 
 
 class TestUntil(unittest.TestCase):
@@ -429,6 +491,17 @@ class TestUntil(unittest.TestCase):
         # Arrange
         self.assertEqual(result, expected)
 
+    def test_AddingLabel(self):
+        # Arrange
+        parser1 = bpr.CharParser('l')
+        parser2 = bpr.CharParser('o')
+        parser3 = bpr.CharParser('r')
+        parser = cmb.until(parser1, parser2, parser3, label='Parser: lor')
+        parser_default_label = cmb.until(parser1, parser2, parser3)
+        # Assert
+        self.assertEqual(parser.label, 'Parser: lor')
+        self.assertEqual(parser_default_label.label, '(.*?)[lor]')
+
 
 class TestLeftParser(unittest.TestCase):
     def test_SuccessCase(self):
@@ -437,11 +510,9 @@ class TestLeftParser(unittest.TestCase):
         parser_l = stp.parse_lowercases()
         parser_r = stp.parse_digits()
         parser = cmb.leftparser(parser_l, parser_r)
-
         # Act
         result = parser(txt)
         expected = res.Success(('abc', ' lorem ipsum'))
-
         # Assert
         self.assertEqual(result, expected)
 
@@ -451,13 +522,21 @@ class TestLeftParser(unittest.TestCase):
         parser_l = stp.parse_lowercases()
         parser_r = stp.parse_digits()
         parser = cmb.leftparser(parser_l, parser_r)
-
         # Act
         result = parser(txt)
         expected = res.Failure('error')
-
         # Assert
         self.assertEqual(result, expected)
+
+    def test_AddingLabel(self):
+        # Arrange
+        parser1 = bpr.CharParser('l')
+        parser2 = bpr.CharParser('o')
+        parser = cmb.leftparser(parser1, parser2, label='Parser: lor')
+        parser_defualt_label = cmb.leftparser(parser1, parser2)
+        # Assert
+        self.assertEqual(parser.label, 'Parser: lor')
+        self.assertEqual(parser_defualt_label.label, 'lo')
 
 
 class TestRightParser(unittest.TestCase):
@@ -467,11 +546,9 @@ class TestRightParser(unittest.TestCase):
         parser_l = stp.parse_lowercases()
         parser_r = stp.parse_digits()
         parser = cmb.rightparser(parser_l, parser_r)
-
         # Act
         result = parser(txt)
         expected = res.Success(('123', ' lorem ipsum'))
-
         # Assert
         self.assertEqual(result, expected)
 
@@ -481,13 +558,21 @@ class TestRightParser(unittest.TestCase):
         parser_l = stp.parse_lowercases()
         parser_r = stp.parse_digits()
         parser = cmb.rightparser(parser_l, parser_r)
-
         # Act
         result = parser(txt)
         expected = res.Failure('error')
-
         # Assert
         self.assertEqual(result, expected)
+
+    def test_AddingLabel(self):
+        # Arrange
+        parser1 = bpr.CharParser('l')
+        parser2 = bpr.CharParser('o')
+        parser = cmb.rightparser(parser1, parser2, label='Parser: lor')
+        parser_default_label = cmb.rightparser(parser1, parser2)
+        # Assert
+        self.assertEqual(parser.label, 'Parser: lor')
+        self.assertEqual(parser_default_label.label, 'lo')
 
 
 class TestBetweenParser(unittest.TestCase):
@@ -497,13 +582,10 @@ class TestBetweenParser(unittest.TestCase):
         parser_l = stp.parse_uppercases()
         parser_m = stp.parse_lowercases()
         parser_r = stp.parse_digits()
-
         parser = cmb.betweenparsers(parser_l, parser_m, parser_r)
-
         # Act
         result = parser(txt)
         expected = res.Success(('abc', ' lorem ipsum'))
-
         # Assert
         self.assertEqual(result, expected)
 
@@ -513,15 +595,23 @@ class TestBetweenParser(unittest.TestCase):
         parser_l = stp.parse_uppercases()
         parser_m = stp.parse_digits()
         parser_r = stp.parse_lowercases()
-
         parser = cmb.betweenparsers(parser_l, parser_m, parser_r)
-
         # Act
         result = parser(txt)
         expected = res.Failure('error')
-
         # Assert
         self.assertEqual(result, expected)
+
+    def test_AddingLabel(self):
+        # Arrange
+        parser1 = bpr.CharParser('l')
+        parser2 = bpr.CharParser('o')
+        parser3 = bpr.CharParser('r')
+        parser = cmb.betweenparsers(parser1, parser2, parser3, label='Parser: lor')
+        parser_default_label = cmb.betweenparsers(parser1, parser2, parser3)
+        # Assert
+        self.assertEqual(parser.label, 'Parser: lor')
+        self.assertEqual(parser_default_label.label, 'lor')
 
 
 class TestSepBy(unittest.TestCase):
@@ -554,16 +644,24 @@ class TestSepBy(unittest.TestCase):
         sep = bpr.CharParser(",")
         item = stp.parse_lowercases()
         parser = cmb.sep_by(item, sep)
-
         # Act
         result1 = parser(txt1)
         expected1 = res.Failure('error')
         result2 = parser(txt2)
         expected2 = res.Failure('error')
-
         # Assert
         self.assertEqual(result1, expected1)
         self.assertEqual(result2, expected2)
+
+    def test_AddingLabel(self):
+        # Arrange
+        parser1 = bpr.CharParser('x')
+        parser2 = bpr.CharParser(',')
+        parser = cmb.sep_by(parser1, parser2, label='Parser: lor')
+        parser_default_label = cmb.sep_by(parser1, parser2)
+        # Assert
+        self.assertEqual(parser.label, 'Parser: lor')
+        self.assertEqual(parser_default_label.label, 'x[,x]+')
 
 
 class TestSepBy1(unittest.TestCase):
@@ -602,3 +700,13 @@ class TestSepBy1(unittest.TestCase):
         self.assertEqual(result1, expected1)
         self.assertEqual(result2, expected2)
         self.assertEqual(result3, expected3)
+
+    def test_AddingLabel(self):
+        # Arrange
+        parser1 = bpr.CharParser('x')
+        parser2 = bpr.CharParser(',')
+        parser = cmb.sep_by1(parser1, parser2, label='Parser: lor')
+        parser_default_label = cmb.sep_by1(parser1, parser2)
+        # Assert
+        self.assertEqual(parser.label, 'Parser: lor')
+        self.assertEqual(parser_default_label.label, 'x[,x]+')

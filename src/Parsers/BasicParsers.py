@@ -2,13 +2,17 @@ import src.Monads.Result as res
 
 
 class CharParser:
-    def __init__(self, val):
+    def __init__(self, val, label=None):
         if isinstance(val, str):
             self._val = val
             self._f = self._inner
+            self._label = label if label else val
         elif callable(val):
             self._val = None
             self._f = val
+            self._label=label if label else "Unknown parser"
+        else:
+            raise Exception("Incorrect initialization of parsers")
 
     def _inner(self, txt):
         if txt == "":
@@ -19,3 +23,10 @@ class CharParser:
 
     def __call__(self, txt):
         return self._f(txt)
+
+    def set_label(self, label):
+        self._label = label
+
+    @property
+    def label(self):
+        return self._label
