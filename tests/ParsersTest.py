@@ -23,3 +23,30 @@ class TestCharParsers(unittest.TestCase):
         expected = res.Failure('error')
         # Assert
         self.assertEqual(result, expected)
+
+    def test_WrongArgumentPassedToConstructor_RaisesException(self):
+        # Act
+        with self.assertRaises(Exception) as context:
+            bp.CharParser(123)
+        # Assert
+        self.assertEqual('Incorrect initialization of parsers',
+                         str(context.exception))
+
+    def test_WhenLabelIsGiven_ReturnsLabel(self):
+        # Arrange
+        parser = bp.CharParser('X', 'SomeLabel')
+        # Assert
+        self.assertEqual(parser.label, 'SomeLabel')
+
+    def test_WhenConstructorCalledWithStringAndNoLabel_ReturnsPredefinedLabel(self):
+        # Arrange
+        parser = bp.CharParser('X')
+        # Assert
+        self.assertEqual(parser.label, 'X parser')
+
+    def test_WhenConstructorCalledWithFuncAndNoLabel_ReturnsPredefinedLabel(self):
+        # Arrange
+        parser = bp.CharParser(lambda x: x)
+        # Assert
+        self.assertEqual(parser.label, 'Unknown parser')
+

@@ -2,3 +2,4 @@
 /.idea
 /src/Monads/__pycache__/*.pyc
 /src/Parsers/__pycache__/*.pyc
+/src/Lexer/__pycache__/*.pyc
