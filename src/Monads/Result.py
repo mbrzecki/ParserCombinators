@@ -26,7 +26,7 @@ class Result(mnd.Monad, ABC):
             raise Exception("Expected callable")
 
         def lifted_func(x):
-            if isinstance(x, Success):
+            if x.isSuccess:
                 try:
                     return Success(func(x.value))
                 except Exception as e:
@@ -34,7 +34,7 @@ class Result(mnd.Monad, ABC):
                         return Failure(str(e.message))
                     else:
                         return Failure(str(e))
-            elif isinstance(x, Failure):
+            elif x.isFailure:
                 return x
             else:
                 raise Failure("Expected Result type, but received " + str(type(x)))
@@ -50,7 +50,7 @@ class Result(mnd.Monad, ABC):
             if not all([isinstance(arg, Result) for arg in args]):
                 raise Exception("Expected Result type")
 
-            if all([isinstance(arg, Success) for arg in args]):
+            if all([arg.isSuccess for arg in args]):
                 try:
                     return Success(func(*[arg.value for arg in args]))
                 except Exception as e:
@@ -58,7 +58,7 @@ class Result(mnd.Monad, ABC):
                         return Failure(str(e.message))
                     else:
                         return Failure(str(e))
-            elif any([isinstance(arg, Failure) for arg in args]):
+            elif any([arg.isFailure for arg in args]):
                 return args
 
         return lifted_func
