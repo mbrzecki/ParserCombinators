@@ -6,14 +6,13 @@ class CharParser:
         if isinstance(val, str):
             self._val = val
             self._f = self._inner
-            self._label = label if label else val
-        elif callable(val):
+            self._label = label if label else val        elif callable(val):
             self._val = None
             self._f = val
             self._label=label if label else "Unknown parser"
         else:
             raise Exception("Incorrect initialization of parsers")
-
+			
     def _inner(self, txt):
         if txt == "":
             return res.Failure("No more input")

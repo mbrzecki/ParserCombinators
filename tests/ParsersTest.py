@@ -49,4 +49,3 @@ class TestCharParsers(unittest.TestCase):
         parser = bp.CharParser(lambda x: x)
         # Assert
         self.assertEqual(parser.label, 'Unknown parser')
-
