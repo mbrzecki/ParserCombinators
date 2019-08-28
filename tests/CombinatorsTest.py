@@ -623,15 +623,13 @@ class TestSepBy(unittest.TestCase):
         sep = bpr.CharParser(",")
         item = stp.parse_lowercases()
         parser = cmb.sep_by(item, sep)
-
         # Act
         result1 = parser(txt1)
-        expected1 = res.Success((['abc', 'def', 'ghi'], ''))
+        expected1 = res.Success(('abc,def,ghi', ''))
         result2 = parser(txt2)
-        expected2 = res.Success((['abc'], ''))
+        expected2 = res.Success(('abc', ''))
         result3 = parser(txt3)
         expected3 = res.Success(('', ''))
-
         # Assert
         self.assertEqual(result1, expected1)
         self.assertEqual(result2, expected2)
@@ -639,19 +637,15 @@ class TestSepBy(unittest.TestCase):
 
     def test_FailureCase(self):
         # Arrange
-        txt1 = 'abc,123,ghi'
-        txt2 = 'abc#def#ghi'
+        txt1 = 'ABC'
         sep = bpr.CharParser(",")
         item = stp.parse_lowercases()
         parser = cmb.sep_by(item, sep)
         # Act
         result1 = parser(txt1)
         expected1 = res.Failure('error')
-        result2 = parser(txt2)
-        expected2 = res.Failure('error')
         # Assert
         self.assertEqual(result1, expected1)
-        self.assertEqual(result2, expected2)
 
     def test_AddingLabel(self):
         # Arrange
@@ -669,23 +663,26 @@ class TestSepBy1(unittest.TestCase):
         # Arrange
         txt1 = 'abc,def,ghi'
         txt2 = 'abc'
+        txt3 = 'abc,def,ghi2132'
         sep = bpr.CharParser(",")
         item = stp.parse_lowercases()
         parser = cmb.sep_by1(item, sep)
         # Act
         result1 = parser(txt1)
-        expected1 = res.Success((['abc', 'def', 'ghi'], ''))
+        expected1 = res.Success(('abc,def,ghi', ''))
         result2 = parser(txt2)
-        expected2 = res.Success((['abc'], ''))
+        expected2 = res.Success(('abc', ''))
+        result3 = parser(txt3)
+        expected3 = res.Success(('abc,def,ghi', '2132'))
         # Assert
         self.assertEqual(result1, expected1)
         self.assertEqual(result2, expected2)
+        self.assertEqual(result3, expected3)
 
     def test_FailureCase(self):
         # Arrange
-        txt1 = 'abc,123,ghi'
-        txt2 = 'abc#def#ghi'
-        txt3 = ''
+        txt1 = 'ABC'
+        txt2 = ''
         sep = bpr.CharParser(",")
         item = stp.parse_lowercases()
         parser = cmb.sep_by1(item, sep)
@@ -694,12 +691,9 @@ class TestSepBy1(unittest.TestCase):
         expected1 = res.Failure('error')
         result2 = parser(txt2)
         expected2 = res.Failure('error')
-        result3 = parser(txt3)
-        expected3 = res.Failure('error')
         # Assert
         self.assertEqual(result1, expected1)
         self.assertEqual(result2, expected2)
-        self.assertEqual(result3, expected3)
 
     def test_AddingLabel(self):
         # Arrange

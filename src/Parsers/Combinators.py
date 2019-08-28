@@ -256,25 +256,21 @@ def sep_by(item, sep, **kwargs):
     if label is None:
         label = item.label + '[' + sep.label + item.label + ']+'
 
-    parser = rightparser(sep, item)
+    sep_item = and_then(sep, item)
+    sep_items = many(sep_item)
 
     def internal(txt):
         if txt == "":
             return res.Success.unit(('', ''))
-        fst_results = item(txt)
-        if fst_results.isFailure:
-            return res.Failure.unit("error")
-        parsed, remaining = fst_results.value
-        if remaining == "":
-            return res.Success.unit(([parsed], ''))
-        ret = [parsed]
-        while remaining:
-            result = parser(remaining)
-            if result.isFailure:
-                return res.Failure.unit("error")
-            p, remaining = result.value
-            ret.append(p)
-        return res.Success.unit((ret, remaining))
+        ret = ''
+        fst_element = item(txt)
+        if fst_element.isSuccess:
+            parsed, remaining = fst_element.value
+            rest_of_elements = sep_items(remaining)
+            if rest_of_elements.isSuccess:
+                parsed_rest, remaining = rest_of_elements.value
+                return res.Success.unit((parsed + parsed_rest, remaining))
+        return res.Failure('error')
 
     return bp.CharParser(internal, label)
 
@@ -286,24 +282,25 @@ def sep_by1(item, sep, **kwargs):
     label = kwargs.get('label', None)
     if label is None:
         label = item.label + '[' + sep.label + item.label + ']+'
-    parser = rightparser(sep, item)
+
+    sep_items = sep_by(item, sep)
+    parser = and_then(item, sep, sep_items)
 
     def internal(txt):
         if txt == "":
             return res.Failure.unit('error')
-        fst_results = item(txt)
-        if fst_results.isFailure:
-            return res.Failure.unit("error")
-        parsed, remaining = fst_results.value
-        if remaining == "":
-            return res.Success.unit(([parsed], ''))
-        ret = [parsed]
-        while remaining:
-            result = parser(remaining)
-            if result.isFailure:
-                return res.Failure.unit("error")
-            p, remaining = result.value
-            ret.append(p)
-        return res.Success.unit((ret, remaining))
+        fst_res = item(txt)
+        if fst_res.isFailure:
+            return res.Failure('error')
+        parsed, remaining = fst_res.value
+        snd_res = sep(remaining)
+        if snd_res.isFailure:
+            return res.Success((parsed, remaining))
+
+        result = parser(txt)
+        if result.isSuccess:
+            parsed, remaining = result.value
+            return res.Success.unit((parsed, remaining))
+        return res.Failure('error')
 
     return bp.CharParser(internal, label)
