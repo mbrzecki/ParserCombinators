@@ -10,6 +10,11 @@ def parse_string(txt, label=None):
     return cmb.and_then(*[bp.CharParser(char) for char in txt], label=label)
 
 
+def parse_one_of_strings(*strings, **kwargs):
+    label = kwargs.get('label', '(' + '|'.join(strings) + ')')
+    return cmb.or_else(*[parse_string(s) for s in strings], label=label)
+
+
 def parse_character(*chars, **kwargs):
     label = kwargs.get('label', None)
     return cmb.or_else(*[bp.CharParser(char) for char in chars], label=label)

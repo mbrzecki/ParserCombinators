@@ -20,6 +20,27 @@ class TestStandardParsers(unittest.TestCase):
         self.assertEqual(parser_succ.label, 'lorem')
         self.assertEqual(parser_fail.label, 'FAIL')
 
+    def test_parse_string(self):
+        # Arrange
+        txt1 = 'lorem ipsum dolor sit amet'
+        txt2 = 'ipsum dolor sit amet'
+        txt3 = 'dolor sit amet'
+        parser_succ = stp.parse_one_of_strings('lorem', 'ipsum', 'dolor')
+        parser_fail = stp.parse_one_of_strings('xxx', label='FAIL')
+        # Act
+        result_succ1 = parser_succ(txt1)
+        result_succ2 = parser_succ(txt2)
+        result_fail = parser_fail(txt3)
+        expected_succ1 = res.Success(('lorem', ' ipsum dolor sit amet'))
+        expected_succ2 = res.Success(('ipsum', ' dolor sit amet'))
+        expected_fail = res.Failure('error')
+        # Assert
+        self.assertEqual(result_succ1, expected_succ1)
+        self.assertEqual(result_succ2, expected_succ2)
+        self.assertEqual(result_fail, expected_fail)
+        self.assertEqual(parser_succ.label, '(lorem|ipsum|dolor)')
+        self.assertEqual(parser_fail.label, 'FAIL')
+
     def test_parse_character(self):
         # Arrange
         txt1 = 'aaa'
@@ -287,7 +308,6 @@ class TestStandardParsers(unittest.TestCase):
         self.assertEqual(res_fail2, exp_fail)
         self.assertEqual(parser.label, 'INTEGER')
         self.assertEqual(parser_label.label, 'spam')
-
 
     def test_parse_unsignedinteger(self):
         # Arrange
