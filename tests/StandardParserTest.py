@@ -286,6 +286,7 @@ class TestStandardParsers(unittest.TestCase):
         txt_succ1 = '1'
         txt_succ2 = '1231###'
         txt_succ3 = '-423vcxv'
+        txt_succ4 = '0'
         txt_fail1 = '01564'
         txt_fail2 = '--1242'
         parser = stp.parse_integer()
@@ -294,16 +295,19 @@ class TestStandardParsers(unittest.TestCase):
         res_succ1 = parser(txt_succ1)
         res_succ2 = parser(txt_succ2)
         res_succ3 = parser(txt_succ3)
+        res_succ4 = parser(txt_succ4)
         res_fail1 = parser(txt_fail1)
         res_fail2 = parser(txt_fail2)
         exp_succ1 = res.Success.unit(("1", ""))
         exp_succ2 = res.Success.unit(("1231", "###"))
         exp_succ3 = res.Success.unit(("-423", "vcxv"))
+        exp_succ4 = res.Success.unit(("0", ""))
         exp_fail = res.Failure.unit("error")
         # Assert
         self.assertEqual(res_succ1, exp_succ1)
         self.assertEqual(res_succ2, exp_succ2)
         self.assertEqual(res_succ3, exp_succ3)
+        self.assertEqual(res_succ4, exp_succ4)
         self.assertEqual(res_fail1, exp_fail)
         self.assertEqual(res_fail2, exp_fail)
         self.assertEqual(parser.label, 'INTEGER')
@@ -313,6 +317,7 @@ class TestStandardParsers(unittest.TestCase):
         # Arrange
         txt_succ1 = '1'
         txt_succ2 = '1231###'
+        txt_succ3 = '0'
         txt_fail1 = '-423vcxv'
         txt_fail2 = '01564'
         parser = stp.parse_unsignedinteger()
@@ -320,15 +325,40 @@ class TestStandardParsers(unittest.TestCase):
         # Act
         res_succ1 = parser(txt_succ1)
         res_succ2 = parser(txt_succ2)
+        res_succ3 = parser(txt_succ3)
         res_fail1 = parser(txt_fail1)
         res_fail2 = parser(txt_fail2)
         exp_succ1 = res.Success.unit(("1", ""))
         exp_succ2 = res.Success.unit(("1231", "###"))
+        exp_succ3 = res.Success.unit(("0", ""))
         exp_fail = res.Failure.unit("error")
         # Assert
         self.assertEqual(res_succ1, exp_succ1)
         self.assertEqual(res_succ2, exp_succ2)
+        self.assertEqual(res_succ3, exp_succ3)
         self.assertEqual(res_fail1, exp_fail)
         self.assertEqual(res_fail2, exp_fail)
         self.assertEqual(parser.label, 'UINTEGER')
+        self.assertEqual(parser_label.label, 'spam')
+
+    def test_parse_float(self):
+        # Arrange
+        txt_succs = ['0.125',  '3.125',  '-3.125', '126543.125',  '126543.125e9',
+                     '32.125E9',  '32.125E-9', '123.0e-10',  '123.0E15', '123.0',
+                     '.3124', '.3124E12']
+        txt_fails = ['00.312', '312.', '0012.0']
+        parser = stp.parse_float()
+        parser_label = stp.parse_float('spam')
+        # Act
+        res_succs = [parser(txt_succ) for txt_succ in txt_succs]
+        exp_succs = [res.Success((txt_succ, '')) for txt_succ in txt_succs]
+        res_fails = [parser(txt_fail) for txt_fail in txt_fails]
+        fail = res.Failure.unit("error")
+        # Assert
+        for e, r in zip(res_succs, exp_succs):
+            self.assertEqual(e, r)
+        for r in res_fails:
+            self.assertEqual(fail, r)
+
+        self.assertEqual(parser.label, 'FLOAT')
         self.assertEqual(parser_label.label, 'spam')

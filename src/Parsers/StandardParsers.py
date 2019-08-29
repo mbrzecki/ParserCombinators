@@ -1,4 +1,5 @@
 import string
+import src.Monads.Result as res
 import src.Parsers.BasicParsers as bp
 import src.Parsers.Combinators as cmb
 #TODO: add Labels
@@ -66,12 +67,32 @@ def parse_word(label='[A-Za-z0-9_]+'):
 
 def parse_integer(label='INTEGER'):
     sign = cmb.opt(bp.CharParser('-'))
-    digits1to9 = cmb.or_else(*[bp.CharParser(char) for char in '123456789'])
-    digits0to9 = cmb.many1(*[bp.CharParser(char) for char in string.digits])
-    return cmb.and_then(sign, digits1to9, cmb.opt(digits0to9), label=label)
+    return cmb.and_then(sign, parse_unsignedinteger(), label=label)
 
 
 def parse_unsignedinteger(label='UINTEGER'):
-    digits1to9 = cmb.or_else(*[bp.CharParser(char) for char in '123456789'])
-    digits0to9 = cmb.many1(*[bp.CharParser(char) for char in string.digits])
-    return cmb.and_then(digits1to9, cmb.opt(digits0to9), label=label)
+    digits_09 = parse_digit('0123456789')
+    digits_19 = parse_character('1', '2', '3', '4', '5', '6', '7', '8', '9')
+    nonzero = cmb.and_then(digits_19, cmb.many(digits_09))
+    zero = bp.CharParser('0')
+
+    def internal(txt):
+        fst_digit = zero(txt)
+        if fst_digit.isSuccess:
+            snd = digits_09(fst_digit.value[1])
+            if snd.isSuccess:
+                return res.Failure('error')
+            else:
+                return fst_digit
+        return nonzero(txt)
+
+    return bp.CharParser(internal, label)
+
+
+def parse_float(label='FLOAT'):
+    sign = cmb.opt(bp.CharParser('-'))
+    coma = bp.CharParser('.')
+    e = cmb.or_else(bp.CharParser('e'), bp.CharParser('E'))
+    exponent = cmb.opt(cmb.and_then(e, parse_integer()))
+    integer = parse_integer()
+    return cmb.and_then(sign, cmb.opt(integer), coma, parse_digits(), exponent, label=label)
