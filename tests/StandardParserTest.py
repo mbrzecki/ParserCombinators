@@ -47,10 +47,10 @@ class TestStandardParsers(unittest.TestCase):
         txt2 = 'bbb'
         txt3 = 'ccc'
         parser = stp.parse_character('a', 'b')
-        parser_label = stp.parse_character('a', 'b', label = 'spam')
+        parser_label = stp.parse_character('ab', label='spam')
         # Act
         result_succ1 = parser(txt1)
-        result_succ2 = parser(txt2)
+        result_succ2 = parser_label(txt2)
         result_fail = parser(txt3)
         expected_succ1 = res.Success(('a', 'aa'))
         expected_succ2 = res.Success(('b', 'bb'))
