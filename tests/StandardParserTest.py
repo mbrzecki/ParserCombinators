@@ -362,3 +362,72 @@ class TestStandardParsers(unittest.TestCase):
 
         self.assertEqual(parser.label, 'FLOAT')
         self.assertEqual(parser_label.label, 'spam')
+
+    def test_lstrip(self):
+        # Arrange
+        txt1 = ' \n\tLorem Ipsum'
+        txt2 = ' \n12312'
+        txt3 = 'aaaLorem Ipsum'
+        exp1 = res.Success(('Lorem', ' Ipsum'))
+        exp2 = res.Success(('12312', ''))
+        exp3 = res.Success(('Lorem', ' Ipsum'))
+        parser1 = stp.lstrip(stp.parse_string("Lorem"))
+        parser2 = stp.lstrip(stp.parse_digits(), ignored_lst=[' ', '\n'])
+        parser3 = stp.lstrip(stp.parse_string("Lorem"), ignored_lst=['a'])
+        # Act
+        res1 = parser1(txt1)
+        res2 = parser2(txt2)
+        res3 = parser3(txt3)
+        # Assert
+        self.assertEqual(res1, exp1)
+        self.assertEqual(res2, exp2)
+        self.assertEqual(res3, exp3)
+        self.assertEqual(parser1.label, "Lorem")
+        self.assertEqual(parser2.label, "[0-9]+")
+        self.assertEqual(parser3.label, "Lorem")
+
+    def test_rstrip(self):
+        # Arrange
+        txt1 = 'Lorem \n\tIpsum'
+        txt2 = '12312 \nXYZ'
+        txt3 = 'LoremaaaIpsum'
+        exp1 = res.Success(('Lorem', 'Ipsum'))
+        exp2 = res.Success(('12312', 'XYZ'))
+        exp3 = res.Success(('Lorem', 'Ipsum'))
+        parser1 = stp.rstrip(stp.parse_string("Lorem"))
+        parser2 = stp.rstrip(stp.parse_digits(), ignored_lst=[' ', '\n'])
+        parser3 = stp.rstrip(stp.parse_string("Lorem"), ignored_lst=['a'])
+        # Act
+        res1 = parser1(txt1)
+        res2 = parser2(txt2)
+        res3 = parser3(txt3)
+        # Assert
+        self.assertEqual(res1, exp1)
+        self.assertEqual(res2, exp2)
+        self.assertEqual(res3, exp3)
+        self.assertEqual(parser1.label, "Lorem")
+        self.assertEqual(parser2.label, "[0-9]+")
+        self.assertEqual(parser3.label, "Lorem")
+
+    def test_strip(self):
+        # Arrange
+        txt1 = ' \n\tLorem \n\tIpsum'
+        txt2 = '  12312 \nXYZ'
+        txt3 = '11Lorem111Ipsum'
+        exp1 = res.Success(('Lorem', 'Ipsum'))
+        exp2 = res.Success(('12312', 'XYZ'))
+        exp3 = res.Success(('Lorem', 'Ipsum'))
+        parser1 = stp.strip(stp.parse_string("Lorem"))
+        parser2 = stp.strip(stp.parse_digits(), ignored_lst=[' ', '\n'])
+        parser3 = stp.strip(stp.parse_string("Lorem"), ignored_lst=['1'])
+        # Act
+        res1 = parser1(txt1)
+        res2 = parser2(txt2)
+        res3 = parser3(txt3)
+        # Assert
+        self.assertEqual(res1, exp1)
+        self.assertEqual(res2, exp2)
+        self.assertEqual(res3, exp3)
+        self.assertEqual(parser1.label, "Lorem")
+        self.assertEqual(parser2.label, "[0-9]+")
+        self.assertEqual(parser3.label, "Lorem")

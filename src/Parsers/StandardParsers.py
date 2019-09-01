@@ -148,3 +148,46 @@ def parse_float(label='FLOAT'):
     exponent = cmb.opt(cmb.and_then(e, parse_integer()))
     integer = parse_integer()
     return cmb.and_then(sign, cmb.opt(integer), coma, parse_digits(), exponent, label=label)
+
+
+def lstrip(parser, ignored_lst=None):
+    """
+    Strips ignored characters from left side
+    """
+    if ignored_lst is None:
+        ignored_lst = [' ', '\t', '\n']
+    ignored_parser = cmb.many(parse_one_of_strings(*ignored_lst))
+
+    def internal(txt):
+        stripping = ignored_parser(txt)
+        return parser(stripping.value[1])
+
+    return bp.CharParser(internal, parser.label)
+
+
+def rstrip(parser, ignored_lst=None):
+    """
+    Strips ignored characters from right side
+    """
+    if ignored_lst is None:
+        ignored_lst = [' ', '\t', '\n']
+    ignored_parser = cmb.many(parse_one_of_strings(*ignored_lst))
+
+    def internal(txt):
+        result = parser(txt)
+        if result.isFailure:
+            return result
+
+        _, remaining = ignored_parser(result.value[1]).value
+        return res.Success((result.value[0], remaining))
+
+    return bp.CharParser(internal, parser.label)
+
+
+def strip(parser, ignored_lst=None):
+    """
+    Strips ignored characters from both sides
+    """
+    if ignored_lst is None:
+        ignored_lst = [' ', '\t', '\n']
+    return lstrip(rstrip(parser, ignored_lst), ignored_lst)
