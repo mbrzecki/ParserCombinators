@@ -11,7 +11,7 @@ def and_then(*parsers, **kwargs):
         label = ''.join([p.label for p in parsers])
 
     if len(parsers) == 1:
-        return bp.CharParser(parsers[0], label)
+        return bp.LParser(parsers[0], label)
 
     if len(parsers) == 2:
         def internal(txt):
@@ -26,7 +26,7 @@ def and_then(*parsers, **kwargs):
             char2, remaining2 = res2.value
 
             return res.Success((char1 + char2, remaining2))
-        return bp.CharParser(internal, label)
+        return bp.LParser(internal, label)
 
     parser_new = and_then(parsers[0], parsers[1])
     new_parsers = [parser_new] + list(parsers[2:])
@@ -42,7 +42,7 @@ def or_else(*parsers, **kwargs):
         label = '[' + ''.join([p.label for p in parsers]) + ']'
 
     if len(parsers) == 1:
-        return bp.CharParser(parsers[0], label)
+        return bp.LParser(parsers[0], label)
 
     if len(parsers) == 2:
         def internal(txt):
@@ -55,7 +55,7 @@ def or_else(*parsers, **kwargs):
                 return res2
 
             return res.Failure('error')
-        return bp.CharParser(internal, label)
+        return bp.LParser(internal, label)
 
     parser_new = or_else(parsers[0], parsers[1])
     new_parsers = [parser_new] + list(parsers[2:])
@@ -87,7 +87,7 @@ def many(*parsers, **kwargs):
         ret = (parsed1 + parsed2, remaining2)
         return res.Success.unit(ret)
 
-    return bp.CharParser(internal, label=label)
+    return bp.LParser(internal, label=label)
 
 
 def many1(*parsers, **kwargs):
@@ -105,7 +105,7 @@ def many1(*parsers, **kwargs):
             return result
         return res.Failure.unit("error")
 
-    return bp.CharParser(internal, label)
+    return bp.LParser(internal, label)
 
 
 def opt(*parsers, **kwargs):
@@ -129,7 +129,7 @@ def opt(*parsers, **kwargs):
                 return fst_result
         return res.Failure('error')
 
-    return bp.CharParser(internal, label)
+    return bp.LParser(internal, label)
 
 
 def parse_any(**kwargs):
@@ -145,7 +145,7 @@ def parse_any(**kwargs):
             return res.Failure("No more input")
         return res.Success.unit((txt[0], txt[1:]))
 
-    return bp.CharParser(internal, label)
+    return bp.LParser(internal, label)
 
 
 def until(*parsers, **kwargs):
@@ -172,7 +172,7 @@ def until(*parsers, **kwargs):
             return res.Success.unit((ret, txt))
         return res.Failure("No more input")
 
-    return bp.CharParser(internal, label)
+    return bp.LParser(internal, label)
 
 
 def leftparser(lparser, rparser, **kwargs):
@@ -195,7 +195,7 @@ def leftparser(lparser, rparser, **kwargs):
 
         return res.Success.unit((parsed, remaining))
 
-    return bp.CharParser(internal, label)
+    return bp.LParser(internal, label)
 
 
 def rightparser(lparser, rparser, **kwargs):
@@ -218,7 +218,7 @@ def rightparser(lparser, rparser, **kwargs):
 
         return res.Success.unit((parsed, remaining))
 
-    return bp.CharParser(internal, label)
+    return bp.LParser(internal, label)
 
 
 def betweenparsers(lparser, mparser, rparser, **kwargs):
@@ -245,7 +245,7 @@ def betweenparsers(lparser, mparser, rparser, **kwargs):
 
         return res.Success.unit((parsed, remaining))
 
-    return bp.CharParser(internal, label)
+    return bp.LParser(internal, label)
 
 
 def sep_by(item, sep, **kwargs):
@@ -272,7 +272,7 @@ def sep_by(item, sep, **kwargs):
                 return res.Success.unit((parsed + parsed_rest, remaining))
         return res.Failure('error')
 
-    return bp.CharParser(internal, label)
+    return bp.LParser(internal, label)
 
 
 def sep_by1(item, sep, **kwargs):
@@ -303,4 +303,4 @@ def sep_by1(item, sep, **kwargs):
             return res.Success.unit((parsed, remaining))
         return res.Failure('error')
 
-    return bp.CharParser(internal, label)
+    return bp.LParser(internal, label)

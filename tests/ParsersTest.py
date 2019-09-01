@@ -7,7 +7,7 @@ class TestCharParsers(unittest.TestCase):
     def test_WhenFirstLetterIsCorrect_ReturnsSuccess(self):
         # Arrange
         txt = 'Lorem ipsum'
-        parser = bp.CharParser('L')
+        parser = bp.LParser('L')
         # Act
         result = parser(txt)
         expected = res.Success(('L', 'orem ipsum'))
@@ -17,7 +17,7 @@ class TestCharParsers(unittest.TestCase):
     def test_WhenFirstLetterIsIncorrect_ReturnsFailure(self):
         # Arrange
         txt = 'Lorem Ipsum'
-        parser = bp.CharParser('X')
+        parser = bp.LParser('X')
         # Act
         result = parser(txt)
         expected = res.Failure('error')
@@ -27,25 +27,25 @@ class TestCharParsers(unittest.TestCase):
     def test_WrongArgumentPassedToConstructor_RaisesException(self):
         # Act
         with self.assertRaises(Exception) as context:
-            bp.CharParser(123)
+            bp.LParser(123)
         # Assert
         self.assertEqual('Incorrect initialization of parsers',
                          str(context.exception))
 
     def test_WhenLabelIsGiven_ReturnsLabel(self):
         # Arrange
-        parser = bp.CharParser('X', 'SomeLabel')
+        parser = bp.LParser('X', 'SomeLabel')
         # Assert
         self.assertEqual(parser.label, 'SomeLabel')
 
     def test_WhenConstructorCalledWithStringAndNoLabel_ReturnsPredefinedLabel(self):
         # Arrange
-        parser = bp.CharParser('X')
+        parser = bp.LParser('X')
         # Assert
         self.assertEqual(parser.label, 'X')
 
     def test_WhenConstructorCalledWithFuncAndNoLabel_ReturnsPredefinedLabel(self):
         # Arrange
-        parser = bp.CharParser(lambda x: x)
+        parser = bp.LParser(lambda x: x)
         # Assert
         self.assertEqual(parser.label, 'Unknown parser')

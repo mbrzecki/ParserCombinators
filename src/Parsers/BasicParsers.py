@@ -1,7 +1,7 @@
 import src.Monads.Result as res
 
 
-class CharParser:
+class LParser:
     def __init__(self, val, label=None):
         if isinstance(val, str):
             self._val = val
