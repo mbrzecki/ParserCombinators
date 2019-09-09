@@ -3,7 +3,7 @@ import src.Monads.Result as res
 import src.Parsers.BasicParsers as bp
 
 
-class TestCharParsers(unittest.TestCase):
+class TestLParsers(unittest.TestCase):
     def test_WhenFirstLetterIsCorrect_ReturnsSuccess(self):
         # Arrange
         txt = 'Lorem ipsum'
