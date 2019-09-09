@@ -1,9 +1,9 @@
 import unittest
 import src.Monads.Result as res
-import src.Parsers.BasicParsers as bp
+import src.BasicParsers.BasicParsers as bp
 
 
-class TestLParsers(unittest.TestCase):
+class TestCharParsers(unittest.TestCase):
     def test_WhenFirstLetterIsCorrect_ReturnsSuccess(self):
         # Arrange
         txt = 'Lorem ipsum'

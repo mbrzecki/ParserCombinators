@@ -3,9 +3,9 @@ import unittest
 import sys
 sys.path.append("../")
 import src.Monads.Result as res
-import src.Parsers.BasicParsers as bpr
-import src.Parsers.Combinators as cmb
-import src.Parsers.StandardParsers as stp
+import src.BasicParsers.BasicParsers as bpr
+import src.BasicParsers.Combinators as cmb
+import src.BasicParsers.StandardParsers as stp
 
 
 class TestAndThen(unittest.TestCase):

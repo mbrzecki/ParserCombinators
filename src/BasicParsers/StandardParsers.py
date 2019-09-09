@@ -1,7 +1,7 @@
 import string
 import src.Monads.Result as res
-import src.Parsers.BasicParsers as bp
-import src.Parsers.Combinators as cmb
+import src.BasicParsers.BasicParsers as bp
+import src.BasicParsers.Combinators as cmb
 
 
 def parse_string(string, label=None):

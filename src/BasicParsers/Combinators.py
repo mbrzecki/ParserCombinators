@@ -1,5 +1,5 @@
 import src.Monads.Result as res
-import src.Parsers.BasicParsers as bp
+import src.BasicParsers.BasicParsers as bp
 
 
 def and_then(*parsers, **kwargs):

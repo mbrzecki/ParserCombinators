@@ -1,6 +1,6 @@
 import unittest
 import src.Monads.Result as res
-import src.Parsers.StandardParsers as stp
+import src.BasicParsers.StandardParsers as stp
 
 
 class TestStandardParsers(unittest.TestCase):
